@@ -1,13 +1,22 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  BrainCircuit, MonitorPlay, Eye, Server, Camera, Tv2, Smartphone, Network,
+  Radio, Atom, Lock, ShieldCheck, Activity, ShieldAlert, LayoutDashboard, LineChart,
+  type LucideIcon,
+} from "lucide-react";
+import {
   NODES,
   LINKS,
   LAYERS,
-  BRAIN_ID,
   type EcoNode,
   type LayerId,
 } from "@/lib/ecosystem-data";
+
+const ICONS: Record<string, LucideIcon> = {
+  BrainCircuit, MonitorPlay, Eye, Server, Camera, Tv2, Smartphone, Network,
+  Radio, Atom, Lock, ShieldCheck, Activity, ShieldAlert, LayoutDashboard, LineChart,
+};
 
 interface Props {
   activeLayers: Record<LayerId, boolean>;
