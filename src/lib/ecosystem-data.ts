@@ -7,6 +7,16 @@ export interface EcoNode {
   description: string;
   features: string[];
   role: string;
+  /** Lucide icon name used to render node visually */
+  icon: string;
+  /** Short tagline shown on hover and in panel hero */
+  tagline?: string;
+  /** Hardware / software specs presented to clients */
+  specs?: { label: string; value: string }[];
+  /** Step-by-step setup guide for installation team */
+  setup?: string[];
+  /** Real-world KPIs / outcomes used in client presentation */
+  kpis?: { label: string; value: string }[];
   /** Polar position: angle in degrees, radius 0..1 (relative to canvas) */
   angle: number;
   radius: number;
