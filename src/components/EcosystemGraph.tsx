@@ -1,13 +1,22 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  BrainCircuit, MonitorPlay, Eye, Server, Camera, Tv2, Smartphone, Network,
+  Radio, Atom, Lock, ShieldCheck, Activity, ShieldAlert, LayoutDashboard, LineChart,
+  type LucideIcon,
+} from "lucide-react";
+import {
   NODES,
   LINKS,
   LAYERS,
-  BRAIN_ID,
   type EcoNode,
   type LayerId,
 } from "@/lib/ecosystem-data";
+
+const ICONS: Record<string, LucideIcon> = {
+  BrainCircuit, MonitorPlay, Eye, Server, Camera, Tv2, Smartphone, Network,
+  Radio, Atom, Lock, ShieldCheck, Activity, ShieldAlert, LayoutDashboard, LineChart,
+};
 
 interface Props {
   activeLayers: Record<LayerId, boolean>;
@@ -177,12 +186,16 @@ export function EcosystemGraph({
             const isHL = highlightedNodes.has(n.id);
             const dim = (highlightedNodes.size > 0 || selectedId) && !isHL && !isSelected;
             const color = n.isBrain ? "var(--brain)" : `var(--layer-${n.layer})`;
-            const r = n.isBrain ? 44 : isSelected || isHover ? 22 : 18;
+            const r = n.isBrain ? 46 : isSelected || isHover ? 26 : 22;
+            const Icon = ICONS[n.icon] ?? Server;
+            const iconSize = n.isBrain ? 36 : 22;
+            // Distinct shape per layer for instant visual recognition
+            const shape = n.isBrain ? "hex" : layerShape(n.layer);
             return (
               <g
                 key={n.id}
                 transform={`translate(${p.x} ${p.y})`}
-                style={{ cursor: "pointer", opacity: dim ? 0.25 : 1, transition: "opacity 200ms" }}
+                style={{ cursor: "pointer", opacity: dim ? 0.22 : 1, transition: "opacity 250ms" }}
                 onMouseEnter={() => setHovered(n.id)}
                 onMouseLeave={() => setHovered(null)}
                 onClick={(e) => {
@@ -191,41 +204,87 @@ export function EcosystemGraph({
                 }}
               >
                 {(isHL || isSelected || n.isBrain) && (
-                  <circle r={r + 14} fill={color} opacity={0.18} className="animate-pulse-ring" />
+                  <NodeShape shape={shape} r={r + 14} fill={color} opacity={0.18} className="animate-pulse-ring" />
                 )}
-                <circle
+                {(isHL || isSelected || n.isBrain) && (
+                  <NodeShape shape={shape} r={r + 7} fill="none" stroke={color} strokeOpacity={0.5} strokeWidth={1} />
+                )}
+                <NodeShape
+                  shape={shape}
                   r={r}
                   fill="oklch(0.16 0.04 265)"
                   stroke={color}
                   strokeWidth={n.isBrain ? 2.5 : 2}
                   filter="url(#glow)"
                 />
-                {n.isBrain && (
-                  <text
-                    textAnchor="middle"
-                    dy="0.35em"
-                    fontSize="13"
-                    fontWeight="700"
-                    fill="oklch(0.98 0.02 320)"
-                    style={{ letterSpacing: "0.08em" }}
+                {/* Icon */}
+                <motion.g
+                  animate={
+                    n.id === "qrng"
+                      ? { rotate: 360 }
+                      : n.id === "lte" || n.id === "cameras"
+                        ? { scale: [1, 1.08, 1] }
+                        : n.isBrain
+                          ? { scale: [1, 1.06, 1] }
+                          : {}
+                  }
+                  transition={{
+                    duration: n.id === "qrng" ? 12 : 2.4,
+                    repeat: Infinity,
+                    ease: n.id === "qrng" ? "linear" : "easeInOut",
+                  }}
+                  style={{ transformOrigin: "center", transformBox: "fill-box" }}
+                >
+                  <foreignObject
+                    x={-iconSize / 2}
+                    y={-iconSize / 2}
+                    width={iconSize}
+                    height={iconSize}
+                    style={{ pointerEvents: "none" }}
                   >
-                    BRAIN
-                  </text>
-                )}
+                    <div
+                      style={{
+                        width: iconSize,
+                        height: iconSize,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color,
+                        filter: `drop-shadow(0 0 6px ${color})`,
+                      }}
+                    >
+                      <Icon size={iconSize} strokeWidth={1.8} />
+                    </div>
+                  </foreignObject>
+                </motion.g>
+
+                {/* Label */}
                 <text
                   textAnchor="middle"
-                  y={r + 18}
+                  y={r + 20}
                   fontSize="12"
-                  fontWeight="500"
-                  fill="oklch(0.92 0.02 240)"
+                  fontWeight="600"
+                  fill="oklch(0.95 0.02 240)"
                   style={{ pointerEvents: "none" }}
                 >
                   {n.label}
                 </text>
+                {n.tagline && (isHover || isSelected || n.isBrain) && (
+                  <text
+                    textAnchor="middle"
+                    y={r + 36}
+                    fontSize="10"
+                    fill="oklch(0.7 0.04 250)"
+                    style={{ pointerEvents: "none" }}
+                  >
+                    {truncate(n.tagline, 42)}
+                  </text>
+                )}
                 {isHover && !isSelected && (
-                  <foreignObject x={r + 8} y={-30} width="220" height="60">
-                    <div className="rounded-md border border-border bg-popover/90 px-2 py-1 text-[11px] text-popover-foreground backdrop-blur">
-                      {n.role}
+                  <foreignObject x={r + 10} y={-36} width="240" height="74">
+                    <div className="rounded-md border border-border bg-popover/95 px-2.5 py-1.5 text-[11px] leading-snug text-popover-foreground shadow-xl backdrop-blur">
+                      <div className="font-semibold text-foreground">{n.label}</div>
+                      <div className="text-muted-foreground">{n.tagline ?? n.role}</div>
                     </div>
                   </foreignObject>
                 )}
@@ -272,4 +331,54 @@ function FlowingPulse({
       transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
     />
   );
+}
+
+function truncate(s: string, n: number) {
+  return s.length > n ? s.slice(0, n - 1) + "…" : s;
+}
+
+function layerShape(layer: LayerId): "circle" | "square" | "diamond" | "hex" | "shield" {
+  switch (layer) {
+    case "infra": return "square";
+    case "connect": return "diamond";
+    case "intel": return "hex";
+    case "security": return "shield";
+    case "ops": return "circle";
+  }
+}
+
+function NodeShape({
+  shape, r, fill, stroke, strokeWidth, strokeOpacity, opacity, filter, className,
+}: {
+  shape: "circle" | "square" | "diamond" | "hex" | "shield";
+  r: number;
+  fill?: string;
+  stroke?: string;
+  strokeWidth?: number;
+  strokeOpacity?: number;
+  opacity?: number;
+  filter?: string;
+  className?: string;
+}) {
+  const common = { fill, stroke, strokeWidth, strokeOpacity, opacity, filter, className } as const;
+  if (shape === "circle") return <circle r={r} {...common} />;
+  if (shape === "square") {
+    const s = r * 1.7;
+    return <rect x={-s / 2} y={-s / 2} width={s} height={s} rx={r * 0.25} {...common} />;
+  }
+  if (shape === "diamond") {
+    const s = r * 1.15;
+    return <polygon points={`0,${-s} ${s},0 0,${s} ${-s},0`} {...common} />;
+  }
+  if (shape === "hex") {
+    const pts = Array.from({ length: 6 }, (_, i) => {
+      const a = (Math.PI / 3) * i - Math.PI / 2;
+      return `${Math.cos(a) * r},${Math.sin(a) * r}`;
+    }).join(" ");
+    return <polygon points={pts} {...common} />;
+  }
+  // shield
+  const w = r * 1.6, h = r * 1.9;
+  const d = `M ${-w / 2} ${-h / 2} L ${w / 2} ${-h / 2} L ${w / 2} ${h / 4} Q ${w / 2} ${h / 2} 0 ${h / 2} Q ${-w / 2} ${h / 2} ${-w / 2} ${h / 4} Z`;
+  return <path d={d} {...common} />;
 }
