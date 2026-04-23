@@ -332,3 +332,53 @@ function FlowingPulse({
     />
   );
 }
+
+function truncate(s: string, n: number) {
+  return s.length > n ? s.slice(0, n - 1) + "…" : s;
+}
+
+function layerShape(layer: LayerId): "circle" | "square" | "diamond" | "hex" | "shield" {
+  switch (layer) {
+    case "infra": return "square";
+    case "connect": return "diamond";
+    case "intel": return "hex";
+    case "security": return "shield";
+    case "ops": return "circle";
+  }
+}
+
+function NodeShape({
+  shape, r, fill, stroke, strokeWidth, strokeOpacity, opacity, filter, className,
+}: {
+  shape: "circle" | "square" | "diamond" | "hex" | "shield";
+  r: number;
+  fill?: string;
+  stroke?: string;
+  strokeWidth?: number;
+  strokeOpacity?: number;
+  opacity?: number;
+  filter?: string;
+  className?: string;
+}) {
+  const common = { fill, stroke, strokeWidth, strokeOpacity, opacity, filter, className } as const;
+  if (shape === "circle") return <circle r={r} {...common} />;
+  if (shape === "square") {
+    const s = r * 1.7;
+    return <rect x={-s / 2} y={-s / 2} width={s} height={s} rx={r * 0.25} {...common} />;
+  }
+  if (shape === "diamond") {
+    const s = r * 1.15;
+    return <polygon points={`0,${-s} ${s},0 0,${s} ${-s},0`} {...common} />;
+  }
+  if (shape === "hex") {
+    const pts = Array.from({ length: 6 }, (_, i) => {
+      const a = (Math.PI / 3) * i - Math.PI / 2;
+      return `${Math.cos(a) * r},${Math.sin(a) * r}`;
+    }).join(" ");
+    return <polygon points={pts} {...common} />;
+  }
+  // shield
+  const w = r * 1.6, h = r * 1.9;
+  const d = `M ${-w / 2} ${-h / 2} L ${w / 2} ${-h / 2} L ${w / 2} ${h / 4} Q ${w / 2} ${h / 2} 0 ${h / 2} Q ${-w / 2} ${h / 2} ${-w / 2} ${h / 4} Z`;
+  return <path d={d} {...common} />;
+}
