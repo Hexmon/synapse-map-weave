@@ -1,0 +1,114 @@
+import { motion, AnimatePresence } from "framer-motion";
+import { X } from "lucide-react";
+import { NODES, LINKS, LAYERS, type EcoNode } from "@/lib/ecosystem-data";
+
+interface Props {
+  nodeId: string | null;
+  onClose: () => void;
+  onSelect: (id: string) => void;
+}
+
+export function NodeDetails({ nodeId, onClose, onSelect }: Props) {
+  const node = NODES.find((n) => n.id === nodeId) ?? null;
+
+  return (
+    <AnimatePresence>
+      {node && (
+        <motion.aside
+          key={node.id}
+          initial={{ x: 360, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: 360, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 280, damping: 30 }}
+          className="absolute right-4 top-20 z-20 w-[340px] rounded-xl border border-border bg-card/85 p-5 shadow-2xl backdrop-blur-xl"
+          style={{ boxShadow: "var(--glow-primary)" }}
+        >
+          <div className="mb-4 flex items-start justify-between gap-2">
+            <div>
+              <div
+                className="mb-1 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
+                style={{
+                  color: LAYERS[node.layer].color,
+                  background: `color-mix(in oklab, ${LAYERS[node.layer].color} 18%, transparent)`,
+                }}
+              >
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ background: LAYERS[node.layer].color }}
+                />
+                {LAYERS[node.layer].label}
+              </div>
+              <h2 className="text-xl font-bold text-foreground">{node.label}</h2>
+            </div>
+            <button
+              onClick={onClose}
+              className="rounded-md p-1 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          <p className="mb-4 text-sm leading-relaxed text-muted-foreground">{node.description}</p>
+
+          <Section title="Role">
+            <p className="text-sm text-foreground/90">{node.role}</p>
+          </Section>
+
+          <Section title="Features">
+            <ul className="grid grid-cols-2 gap-1.5">
+              {node.features.map((f) => (
+                <li
+                  key={f}
+                  className="rounded-md border border-border/60 bg-background/40 px-2 py-1 text-[11px] text-foreground/80"
+                >
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </Section>
+
+          <ConnectedNodes node={node} onSelect={onSelect} />
+        </motion.aside>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mb-4">
+      <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+        {title}
+      </h3>
+      {children}
+    </div>
+  );
+}
+
+function ConnectedNodes({ node, onSelect }: { node: EcoNode; onSelect: (id: string) => void }) {
+  const connectedIds = new Set<string>();
+  for (const l of LINKS) {
+    if (l.source === node.id) connectedIds.add(l.target);
+    if (l.target === node.id) connectedIds.add(l.source);
+  }
+  const connected = NODES.filter((n) => connectedIds.has(n.id));
+  if (connected.length === 0) return null;
+
+  return (
+    <Section title={`Connected (${connected.length})`}>
+      <div className="flex flex-wrap gap-1.5">
+        {connected.map((c) => (
+          <button
+            key={c.id}
+            onClick={() => onSelect(c.id)}
+            className="rounded-md border border-border/60 bg-background/40 px-2 py-1 text-[11px] text-foreground/80 transition hover:border-primary hover:text-foreground"
+            style={{ borderColor: `color-mix(in oklab, ${LAYERS[c.layer].color} 35%, transparent)` }}
+          >
+            {c.label}
+          </button>
+        ))}
+      </div>
+    </Section>
+  );
+}
