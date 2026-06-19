@@ -306,7 +306,7 @@ export function EcosystemGraph({
             return (
               <g
                 key={n.id}
-                transform={`translate(${p.x} ${p.y})`}
+                transform={`translate(${svgPathNum(p.x)} ${svgPathNum(p.y)})`}
                 style={{ cursor: "pointer", opacity: dim ? 0.22 : 1, transition: "opacity 250ms" }}
                 onMouseEnter={() => setHovered(n.id)}
                 onMouseLeave={() => setHovered(null)}
