@@ -2,13 +2,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   X, BrainCircuit, MonitorPlay, Eye, Server, Camera, Tv2, Smartphone, Network,
   Radio, Atom, Lock, ShieldCheck, Activity, ShieldAlert, LayoutDashboard, LineChart,
-  Wrench, Gauge, Cpu, Link2, type LucideIcon,
+  Wrench, Gauge, Cpu, Link2, Cable, ServerCog, type LucideIcon,
 } from "lucide-react";
 import { NODES, LINKS, LAYERS, type EcoNode } from "@/lib/ecosystem-data";
 
 const ICONS: Record<string, LucideIcon> = {
   BrainCircuit, MonitorPlay, Eye, Server, Camera, Tv2, Smartphone, Network,
   Radio, Atom, Lock, ShieldCheck, Activity, ShieldAlert, LayoutDashboard, LineChart,
+  Cable, ServerCog,
 };
 
 interface Props {

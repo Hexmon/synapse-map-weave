@@ -1,4 +1,4 @@
-export type LayerId = "infra" | "connect" | "intel" | "security" | "ops";
+export type LayerId = "infra" | "connect" | "intel" | "security" | "ops" | "quantum" | "local";
 
 export interface EcoNode {
   id: string;
@@ -28,31 +28,60 @@ export interface EcoLink {
   target: string;
 }
 
+/** Anatomical regions — used to draw clean sector wedges on the canvas. */
+export interface Sector {
+  id: string;
+  label: string;
+  sublabel: string;
+  /** angles in degrees, 0 = top, clockwise */
+  startAngle: number;
+  endAngle: number;
+  color: string;
+}
+
+export const SECTORS: Sector[] = [
+  { id: "vision",     label: "Sensory Cortex",     sublabel: "Eyes · Vision AI",       startAngle: -36, endAngle:  36, color: "var(--layer-intel)" },
+  { id: "expression", label: "Expression Cortex",  sublabel: "Voice · Display",         startAngle:  36, endAngle: 108, color: "var(--layer-infra)" },
+  { id: "operations", label: "Operations",         sublabel: "Command · Hands",         startAngle: 108, endAngle: 180, color: "var(--layer-ops)" },
+  { id: "muscle",     label: "Motor Cortex",       sublabel: "Compute · Muscle",        startAngle: 180, endAngle: 252, color: "var(--layer-infra)" },
+  { id: "synaptic",   label: "Synaptic Network",   sublabel: "LTE · LAN · Pathways",    startAngle: 252, endAngle: 324, color: "var(--layer-connect)" },
+];
+
 export const LAYERS: Record<LayerId, { label: string; color: string; description: string }> = {
   infra: {
     label: "Infrastructure",
     color: "var(--layer-infra)",
-    description: "Always-on physical foundation: compute, cameras, kiosks, networking.",
+    description: "Physical foundation — the body that hosts the brain.",
   },
   connect: {
-    label: "Connectivity",
+    label: "Synaptic Network",
     color: "var(--layer-connect)",
-    description: "Private LTE binds every device into one unified network.",
+    description: "Private LTE + LAN — the synapses carrying every signal.",
   },
   intel: {
-    label: "Intelligence",
+    label: "Intelligence (AI Cortex)",
     color: "var(--layer-intel)",
-    description: "The Smart Brain — AI orchestrator coordinating products in real time.",
+    description: "Smart Brain + Vision Cortex coordinating responses.",
   },
   security: {
-    label: "Security",
+    label: "Security (TLS · MDM)",
     color: "var(--layer-security)",
-    description: "Post-quantum cryptography, TLS and MDM wrap every signal.",
+    description: "TLS fabric and device management for every endpoint.",
   },
   ops: {
     label: "Operations",
     color: "var(--layer-ops)",
-    description: "NOC, SOC and Command Center keep humans in the loop.",
+    description: "NOC, SOC, Command Center — humans in the loop.",
+  },
+  quantum: {
+    label: "Quantum-Secure Shell",
+    color: "var(--layer-quantum)",
+    description: "PQC + QRNG outer shell wrapping every channel.",
+  },
+  local: {
+    label: "Local HCI Zone",
+    color: "var(--layer-local)",
+    description: "Local HTTPS + internal DNS — a self-contained secure environment.",
   },
 };
 
@@ -113,7 +142,7 @@ export const NODES: EcoNode[] = [
       { label: "Screens managed", value: "Centrally" },
       { label: "Override push", value: "< 2 s site-wide" },
     ],
-    angle: 120, radius: 0.18 },
+    angle: 54, radius: 0.32 },
   { id: "hexcam", label: "Vyracam / HexCam", layer: "intel",
     description: "AI vision pipeline detecting events: fire, intrusion, crowd density, anomalies.",
     features: ["Object detection", "Event classification", "Edge inference", "Low-latency stream"],
@@ -135,7 +164,7 @@ export const NODES: EcoNode[] = [
       { label: "False positives", value: "< 0.5%" },
       { label: "Time to detect", value: "< 900 ms" },
     ],
-    angle: 240, radius: 0.18 },
+    angle: 350, radius: 0.32 },
 
   // Infrastructure (outer ring, bottom arc)
   { id: "gpu", label: "GPU Compute", layer: "infra",
@@ -159,7 +188,7 @@ export const NODES: EcoNode[] = [
       { label: "GPU utilisation", value: "65–80%" },
       { label: "Cost / inference", value: "−42% vs cloud" },
     ],
-    angle: 200, radius: 0.42 },
+    angle: 204, radius: 0.32 },
   { id: "cameras", label: "Smart Cameras", layer: "infra",
     description: "Perimeter and interior smart cameras with on-device pre-processing.",
     features: ["4K capture", "IR night vision", "Edge filtering"],
@@ -182,7 +211,7 @@ export const NODES: EcoNode[] = [
       { label: "Coverage", value: "100% perimeter" },
       { label: "Mean stream uptime", value: "99.95%" },
     ],
-    angle: 230, radius: 0.42 },
+    angle: 10, radius: 0.52 },
   { id: "led", label: "Active LED Walls", layer: "infra",
     description: "Large-format LED walls for command centers and public displays.",
     features: ["Pixel-mapped", "HDR", "Redundant controllers"],
@@ -205,7 +234,7 @@ export const NODES: EcoNode[] = [
       { label: "Color accuracy", value: "ΔE < 2" },
       { label: "Failover", value: "< 1 s" },
     ],
-    angle: 310, radius: 0.42 },
+    angle: 78, radius: 0.50 },
   { id: "kiosks", label: "Smart Kiosks", layer: "infra",
     description: "Interactive kiosks for wayfinding, alerts and self-service.",
     features: ["Touch UI", "Emergency mode", "Remote managed"],
@@ -227,7 +256,7 @@ export const NODES: EcoNode[] = [
       { label: "Daily interactions", value: "1.2k avg" },
       { label: "Emergency switch-over", value: "< 1 s" },
     ],
-    angle: 340, radius: 0.42 },
+    angle: 100, radius: 0.36 },
   { id: "network-hw", label: "Network Hardware", layer: "infra",
     description: "Switches, routers and OEM gateways forming the physical fabric.",
     features: ["L2/L3", "Redundant paths", "PoE+"],
@@ -249,13 +278,13 @@ export const NODES: EcoNode[] = [
       { label: "Convergence", value: "< 200 ms" },
       { label: "Port availability", value: "99.99%" },
     ],
-    angle: 170, radius: 0.42 },
+    angle: 228, radius: 0.52 },
 
   // Connectivity
   { id: "lte", label: "Private LTE", layer: "connect",
     description: "Dedicated cellular network binding all infrastructure into one secure fabric.",
-    features: ["Sub-10ms latency", "Carrier-grade", "SIM-based auth"],
-    role: "Carries every packet between layers.",
+    features: ["Sub-10ms latency", "Carrier-grade", "SIM-based auth", "Wireless synapse"],
+    role: "Wireless synapse — carries mobile + perimeter signals.",
     icon: "Radio",
     tagline: "Your own private mobile network — no carrier in the loop.",
     specs: [
@@ -274,7 +303,56 @@ export const NODES: EcoNode[] = [
       { label: "Avg latency", value: "8 ms" },
       { label: "Packet loss", value: "< 0.1%" },
     ],
-    angle: 90, radius: 0.32 },
+    angle: 276, radius: 0.32 },
+
+  // NEW — LAN (wired synapse)
+  { id: "lan", label: "Wired LAN", layer: "connect",
+    description: "On-site wired LAN backbone — the wired synapse that pairs with Private LTE for full redundancy.",
+    features: ["10/25/100 GbE", "Dual-home redundancy", "Wire-speed switching", "Zero-trust segmentation"],
+    role: "Wired synapse — carries high-throughput, low-jitter traffic.",
+    icon: "Cable",
+    tagline: "Wired pathways for the things that can't drop a packet.",
+    specs: [
+      { label: "Backbone", value: "100 GbE spine" },
+      { label: "Edge", value: "25 GbE / PoE++" },
+      { label: "Segmentation", value: "Zero-trust VLANs" },
+    ],
+    setup: [
+      "Pull fiber to every IDF; copper PoE++ to edge.",
+      "Stand up spine-leaf with dual uplinks per access switch.",
+      "Bind LAN + LTE under one SD-WAN overlay for seamless failover.",
+      "Apply zero-trust segmentation per device class.",
+    ],
+    kpis: [
+      { label: "Jitter", value: "< 1 ms" },
+      { label: "Failover w/ LTE", value: "< 200 ms" },
+    ],
+    angle: 300, radius: 0.40 },
+
+  // NEW — Local HCI zone (inner cocoon)
+  { id: "local-hci", label: "Local HCI Zone", layer: "local",
+    description: "Hyper-converged local environment — internal DNS and locally-issued HTTPS certificates create a fully self-contained, offline-capable secure zone around the brain.",
+    features: ["Internal DNS", "Local CA + HTTPS", "Hyper-converged compute", "Air-gappable"],
+    role: "Secure local environment — every service is resolvable and trusted without the internet.",
+    icon: "ServerCog",
+    tagline: "A site that trusts itself — no internet required.",
+    specs: [
+      { label: "DNS", value: "Internal authoritative + split-horizon" },
+      { label: "HTTPS", value: "Private CA, 24h cert rotation" },
+      { label: "Cluster", value: "3-node HCI (compute + storage)" },
+      { label: "Mode", value: "Online · Offline · Air-gap" },
+    ],
+    setup: [
+      "Deploy 3-node HCI cluster co-located with the brain.",
+      "Stand up internal DNS zone (e.g. site.hex.local).",
+      "Issue private root CA; distribute trust to every endpoint via MDM.",
+      "Bind every internal service to *.site.hex.local with auto-rotated certs.",
+    ],
+    kpis: [
+      { label: "Internal DNS p95", value: "< 2 ms" },
+      { label: "Offline operation", value: "Full" },
+    ],
+    angle: 180, radius: 0.14 },
 
   // Security
   { id: "qrng", label: "PQC QRNG", layer: "security",
@@ -298,7 +376,7 @@ export const NODES: EcoNode[] = [
       { label: "Key rotation", value: "Daily" },
       { label: "PQ readiness", value: "100%" },
     ],
-    angle: 30, radius: 0.32 },
+    angle: 288, radius: 0.62 },
   { id: "tls", label: "TLS Fabric", layer: "security",
     description: "TLS termination and mutual auth across every service hop.",
     features: ["mTLS", "Cert automation", "Cipher policy"],
@@ -320,7 +398,7 @@ export const NODES: EcoNode[] = [
       { label: "Handshake p95", value: "12 ms" },
       { label: "Cert incidents", value: "0 / quarter" },
     ],
-    angle: 60, radius: 0.42 },
+    angle: 288, radius: 0.52 },
   { id: "mdm", label: "MDM", layer: "security",
     description: "Mobile Device Management for kiosks, cameras and field devices.",
     features: ["Remote wipe", "Policy push", "Compliance"],
@@ -342,7 +420,7 @@ export const NODES: EcoNode[] = [
       { label: "Compliance rate", value: "100%" },
       { label: "MTTR (lost device)", value: "< 5 min" },
     ],
-    angle: 0, radius: 0.42 },
+    angle: 18, radius: 0.62 },
 
   // Operations
   { id: "noc", label: "NOC", layer: "ops",
@@ -366,7 +444,7 @@ export const NODES: EcoNode[] = [
       { label: "MTTA", value: "3 min" },
       { label: "Network uptime", value: "99.99%" },
     ],
-    angle: 110, radius: 0.42 },
+    angle: 148, radius: 0.52 },
   { id: "soc", label: "SOC", layer: "ops",
     description: "Security Operations Center — monitors threats and anomalies.",
     features: ["SIEM", "Threat hunt", "Forensics"],
@@ -388,7 +466,7 @@ export const NODES: EcoNode[] = [
       { label: "MTTD", value: "< 2 min" },
       { label: "Incidents auto-triaged", value: "78%" },
     ],
-    angle: 140, radius: 0.42 },
+    angle: 170, radius: 0.52 },
   { id: "command", label: "Command Center", layer: "ops",
     description: "Unified command center with active LED walls for situational awareness.",
     features: ["Multi-feed", "Scenario playbooks", "Voice ops"],
@@ -410,7 +488,7 @@ export const NODES: EcoNode[] = [
       { label: "Operator response", value: "< 30 s" },
       { label: "Scenario coverage", value: "20+ playbooks" },
     ],
-    angle: 70, radius: 0.32 },
+    angle: 126, radius: 0.32 },
   { id: "monitor", label: "Network Monitor", layer: "ops",
     description: "Real-time network monitoring system feeding NOC dashboards.",
     features: ["Flow analytics", "Anomaly alerts", "Topology map"],
@@ -432,17 +510,20 @@ export const NODES: EcoNode[] = [
       { label: "Anomalies caught early", value: "92%" },
       { label: "False alarm rate", value: "< 3%" },
     ],
-    angle: 150, radius: 0.32 },
+    angle: 144, radius: 0.42 },
 ];
 
 export const LINKS: EcoLink[] = [
   // Brain to intelligence products
   { source: BRAIN_ID, target: "darshan" },
   { source: BRAIN_ID, target: "hexcam" },
-  // Brain to security & ops
-  { source: BRAIN_ID, target: "qrng" },
+  // Brain to local secure zone & ops
+  { source: BRAIN_ID, target: "local-hci" },
   { source: BRAIN_ID, target: "command" },
   { source: BRAIN_ID, target: "lte" },
+  { source: BRAIN_ID, target: "lan" },
+  { source: "local-hci", target: "tls" },
+  { source: "local-hci", target: "gpu" },
   // Intelligence to infra
   { source: "hexcam", target: "cameras" },
   { source: "hexcam", target: "gpu" },
@@ -452,16 +533,20 @@ export const LINKS: EcoLink[] = [
   { source: "lte", target: "network-hw" },
   { source: "lte", target: "cameras" },
   { source: "lte", target: "kiosks" },
-  { source: "lte", target: "led" },
-  { source: "lte", target: "gpu" },
+  { source: "lan", target: "network-hw" },
+  { source: "lan", target: "led" },
+  { source: "lan", target: "gpu" },
+  { source: "lan", target: "kiosks" },
   // Security wraps
   { source: "qrng", target: "tls" },
   { source: "tls", target: "lte" },
+  { source: "tls", target: "lan" },
   { source: "mdm", target: "kiosks" },
   { source: "mdm", target: "cameras" },
   // Ops
   { source: "noc", target: "monitor" },
   { source: "monitor", target: "lte" },
+  { source: "monitor", target: "lan" },
   { source: "soc", target: "hexcam" },
   { source: "command", target: "led" },
   { source: "command", target: "darshan" },
