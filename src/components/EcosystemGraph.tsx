@@ -40,13 +40,16 @@ const LOCAL_R   = RADIUS_SCALE * 0.22;      // inner local HCI ring
 function polar(angleDeg: number, r: number) {
   const a = ((angleDeg - 90) * Math.PI) / 180;
   return {
-    x: CENTER.x + Math.cos(a) * r * RADIUS_SCALE,
-    y: CENTER.y + Math.sin(a) * r * RADIUS_SCALE,
+    x: Math.round((CENTER.x + Math.cos(a) * r * RADIUS_SCALE) * 100) / 100,
+    y: Math.round((CENTER.y + Math.sin(a) * r * RADIUS_SCALE) * 100) / 100,
   };
 }
 function polarAbs(angleDeg: number, rPx: number) {
   const a = ((angleDeg - 90) * Math.PI) / 180;
-  return { x: CENTER.x + Math.cos(a) * rPx, y: CENTER.y + Math.sin(a) * rPx };
+  return {
+    x: Math.round((CENTER.x + Math.cos(a) * rPx) * 100) / 100,
+    y: Math.round((CENTER.y + Math.sin(a) * rPx) * 100) / 100,
+  };
 }
 function sectorPath(startDeg: number, endDeg: number, rInner: number, rOuter: number) {
   const a1 = polarAbs(startDeg, rOuter);
