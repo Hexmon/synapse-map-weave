@@ -175,12 +175,17 @@ export function EcosystemGraph({
             const a = polarAbs(s.startAngle + 4, r);
             const b = polarAbs(s.endAngle - 4, r);
             return (
-              <path key={id} id={id} d={`M ${a.x} ${a.y} A ${r} ${r} 0 0 1 ${b.x} ${b.y}`} fill="none" />
+              <path
+                key={id}
+                id={id}
+                d={`M ${svgPathNum(a.x)} ${svgPathNum(a.y)} A ${svgPathNum(r)} ${svgPathNum(r)} 0 0 1 ${svgPathNum(b.x)} ${svgPathNum(b.y)}`}
+                fill="none"
+              />
             );
           })}
         </defs>
 
-        <g transform={`translate(${view.x} ${view.y}) scale(${view.k})`}>
+        <g transform={`translate(${svgPathNum(view.x)} ${svgPathNum(view.y)}) scale(${svgPathNum(view.k)})`}>
           {/* Quantum-Secure outer shell band */}
           <circle cx={CENTER.x} cy={CENTER.y} r={QUANTUM_R + 18} fill="url(#quantumShell)" />
           <circle
@@ -247,7 +252,7 @@ export function EcosystemGraph({
               key={r}
               cx={CENTER.x}
               cy={CENTER.y}
-              r={r * RADIUS_SCALE}
+              r={svgNum(r * RADIUS_SCALE)}
               fill="none"
               stroke="var(--grid-line)"
               strokeDasharray="2 10"
