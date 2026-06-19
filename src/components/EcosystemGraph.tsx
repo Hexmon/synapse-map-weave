@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   BrainCircuit, MonitorPlay, Eye, Server, Camera, Tv2, Smartphone, Network,
   Radio, Atom, Lock, ShieldCheck, Activity, ShieldAlert, LayoutDashboard, LineChart,
+  Cable, ServerCog,
   type LucideIcon,
 } from "lucide-react";
 import {
   NODES,
   LINKS,
   LAYERS,
+  SECTORS,
   type EcoNode,
   type LayerId,
 } from "@/lib/ecosystem-data";
@@ -16,6 +18,7 @@ import {
 const ICONS: Record<string, LucideIcon> = {
   BrainCircuit, MonitorPlay, Eye, Server, Camera, Tv2, Smartphone, Network,
   Radio, Atom, Lock, ShieldCheck, Activity, ShieldAlert, LayoutDashboard, LineChart,
+  Cable, ServerCog,
 };
 
 interface Props {
@@ -27,10 +30,12 @@ interface Props {
   flowingLinks: Set<string>;
 }
 
-const W = 1200;
-const H = 800;
+const W = 1400;
+const H = 900;
 const CENTER = { x: W / 2, y: H / 2 };
-const RADIUS_SCALE = Math.min(W, H) * 0.55;
+const RADIUS_SCALE = Math.min(W, H) * 0.46;
+const QUANTUM_R = RADIUS_SCALE * 0.7;       // outer secure shell
+const LOCAL_R   = RADIUS_SCALE * 0.22;      // inner local HCI ring
 
 function polar(angleDeg: number, r: number) {
   const a = ((angleDeg - 90) * Math.PI) / 180;
@@ -38,6 +43,18 @@ function polar(angleDeg: number, r: number) {
     x: CENTER.x + Math.cos(a) * r * RADIUS_SCALE,
     y: CENTER.y + Math.sin(a) * r * RADIUS_SCALE,
   };
+}
+function polarAbs(angleDeg: number, rPx: number) {
+  const a = ((angleDeg - 90) * Math.PI) / 180;
+  return { x: CENTER.x + Math.cos(a) * rPx, y: CENTER.y + Math.sin(a) * rPx };
+}
+function sectorPath(startDeg: number, endDeg: number, rInner: number, rOuter: number) {
+  const a1 = polarAbs(startDeg, rOuter);
+  const a2 = polarAbs(endDeg,   rOuter);
+  const b1 = polarAbs(endDeg,   rInner);
+  const b2 = polarAbs(startDeg, rInner);
+  const large = Math.abs(endDeg - startDeg) > 180 ? 1 : 0;
+  return `M ${a1.x} ${a1.y} A ${rOuter} ${rOuter} 0 ${large} 1 ${a2.x} ${a2.y} L ${b1.x} ${b1.y} A ${rInner} ${rInner} 0 ${large} 0 ${b2.x} ${b2.y} Z`;
 }
 
 function linkKey(s: string, t: string) {
@@ -102,7 +119,7 @@ export function EcosystemGraph({
         className="pointer-events-none absolute inset-0 opacity-[0.18]"
         style={{
           backgroundImage:
-            "linear-gradient(oklch(0.4 0.05 265 / 0.4) 1px, transparent 1px), linear-gradient(90deg, oklch(0.4 0.05 265 / 0.4) 1px, transparent 1px)",
+            "linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px)",
           backgroundSize: "48px 48px",
         }}
       />
@@ -115,9 +132,14 @@ export function EcosystemGraph({
       >
         <defs>
           <radialGradient id="brainGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="oklch(0.85 0.2 320)" stopOpacity="0.9" />
-            <stop offset="60%" stopColor="oklch(0.6 0.2 290)" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="oklch(0.2 0.05 265)" stopOpacity="0" />
+            <stop offset="0%"   stopColor="var(--brain)"        stopOpacity="0.85" />
+            <stop offset="60%"  stopColor="var(--brain)"        stopOpacity="0.25" />
+            <stop offset="100%" stopColor="var(--brain)"        stopOpacity="0" />
+          </radialGradient>
+          <radialGradient id="quantumShell" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stopColor="var(--layer-quantum)" stopOpacity="0" />
+            <stop offset="92%"  stopColor="var(--layer-quantum)" stopOpacity="0.05" />
+            <stop offset="100%" stopColor="var(--layer-quantum)" stopOpacity="0.35" />
           </radialGradient>
           <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="3.5" result="b" />
@@ -126,24 +148,94 @@ export function EcosystemGraph({
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
+          {SECTORS.map((s) => {
+            const mid = (s.startAngle + s.endAngle) / 2;
+            const id = `sectorArc-${s.id}`;
+            const r = RADIUS_SCALE * 0.66;
+            const a = polarAbs(s.startAngle + 4, r);
+            const b = polarAbs(s.endAngle - 4, r);
+            return (
+              <path key={id} id={id} d={`M ${a.x} ${a.y} A ${r} ${r} 0 0 1 ${b.x} ${b.y}`} fill="none" />
+            );
+          })}
         </defs>
 
         <g transform={`translate(${view.x} ${view.y}) scale(${view.k})`}>
-          {/* Concentric guide rings */}
-          {[0.18, 0.32, 0.42].map((r) => (
+          {/* Quantum-Secure outer shell band */}
+          <circle cx={CENTER.x} cy={CENTER.y} r={QUANTUM_R + 18} fill="url(#quantumShell)" />
+          <circle
+            cx={CENTER.x} cy={CENTER.y} r={QUANTUM_R}
+            fill="none"
+            stroke="var(--layer-quantum)"
+            strokeOpacity={0.55}
+            strokeWidth={1.2}
+            strokeDasharray="2 8"
+          />
+          <text
+            textAnchor="middle"
+            fontSize="11"
+            letterSpacing="0.3em"
+            fill="var(--layer-quantum)"
+            opacity={0.85}
+          >
+            <textPath href="#sectorArc-vision" startOffset="50%">
+              QUANTUM-SECURE COMMUNICATION SHELL · PQC + QRNG
+            </textPath>
+          </text>
+
+          {/* Sector wedges */}
+          {SECTORS.map((s) => (
+            <g key={s.id} pointerEvents="none">
+              <path
+                d={sectorPath(s.startAngle, s.endAngle, LOCAL_R + 18, QUANTUM_R - 6)}
+                fill={s.color}
+                opacity={0.04}
+              />
+              <path
+                d={sectorPath(s.startAngle, s.endAngle, LOCAL_R + 18, QUANTUM_R - 6)}
+                fill="none"
+                stroke={s.color}
+                strokeOpacity={0.18}
+                strokeWidth={1}
+              />
+              <text fontSize="11" letterSpacing="0.25em" fill={s.color} opacity={0.95}>
+                <textPath href={`#sectorArc-${s.id}`} startOffset="50%" textAnchor="middle">
+                  {s.label.toUpperCase()} · {s.sublabel}
+                </textPath>
+              </text>
+            </g>
+          ))}
+
+          {/* Local HCI inner secure ring */}
+          <circle
+            cx={CENTER.x} cy={CENTER.y} r={LOCAL_R}
+            fill="var(--layer-local)"
+            opacity={0.05}
+          />
+          <circle
+            cx={CENTER.x} cy={CENTER.y} r={LOCAL_R}
+            fill="none"
+            stroke="var(--layer-local)"
+            strokeOpacity={0.55}
+            strokeWidth={1}
+            strokeDasharray="3 5"
+          />
+
+          {/* Subtle concentric guides */}
+          {[0.32, 0.52].map((r) => (
             <circle
               key={r}
               cx={CENTER.x}
               cy={CENTER.y}
               r={r * RADIUS_SCALE}
               fill="none"
-              stroke="oklch(0.5 0.05 265 / 0.18)"
-              strokeDasharray="4 6"
+              stroke="var(--grid-line)"
+              strokeDasharray="2 10"
             />
           ))}
 
           {/* Brain glow */}
-          <circle cx={CENTER.x} cy={CENTER.y} r={120} fill="url(#brainGlow)" />
+          <circle cx={CENTER.x} cy={CENTER.y} r={140} fill="url(#brainGlow)" />
 
           {/* Links */}
           {LINKS.map((l) => {
@@ -212,7 +304,7 @@ export function EcosystemGraph({
                 <NodeShape
                   shape={shape}
                   r={r}
-                  fill="oklch(0.16 0.04 265)"
+                  fill="var(--node-fill)"
                   stroke={color}
                   strokeWidth={n.isBrain ? 2.5 : 2}
                   filter="url(#glow)"
@@ -264,7 +356,7 @@ export function EcosystemGraph({
                   y={r + 20}
                   fontSize="12"
                   fontWeight="600"
-                  fill="oklch(0.95 0.02 240)"
+                  fill="var(--foreground)"
                   style={{ pointerEvents: "none" }}
                 >
                   {n.label}
@@ -274,7 +366,7 @@ export function EcosystemGraph({
                     textAnchor="middle"
                     y={r + 36}
                     fontSize="10"
-                    fill="oklch(0.7 0.04 250)"
+                    fill="var(--muted-foreground)"
                     style={{ pointerEvents: "none" }}
                   >
                     {truncate(n.tagline, 42)}
@@ -344,6 +436,8 @@ function layerShape(layer: LayerId): "circle" | "square" | "diamond" | "hex" | "
     case "intel": return "hex";
     case "security": return "shield";
     case "ops": return "circle";
+    case "quantum": return "shield";
+    case "local": return "hex";
   }
 }
 
