@@ -169,7 +169,6 @@ export function EcosystemGraph({
             </feMerge>
           </filter>
           {SECTORS.map((s) => {
-            const mid = (s.startAngle + s.endAngle) / 2;
             const id = `sectorArc-${s.id}`;
             const r = RADIUS_SCALE * 0.66;
             const a = polarAbs(s.startAngle + 4, r);
