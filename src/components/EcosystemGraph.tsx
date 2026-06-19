@@ -36,19 +36,34 @@ const CENTER = { x: W / 2, y: H / 2 };
 const RADIUS_SCALE = Math.min(W, H) * 0.46;
 const QUANTUM_R = RADIUS_SCALE * 0.7;       // outer secure shell
 const LOCAL_R   = RADIUS_SCALE * 0.22;      // inner local HCI ring
+const SVG_PRECISION = 2;
+
+function svgNum(value: number) {
+  const factor = 10 ** SVG_PRECISION;
+  const rounded = Math.round((value + Number.EPSILON) * factor) / factor;
+  return Object.is(rounded, -0) ? 0 : rounded;
+}
+
+function svgPair(x: number, y: number) {
+  return `${svgNum(x)},${svgNum(y)}`;
+}
+
+function svgPathNum(value: number) {
+  return String(svgNum(value));
+}
 
 function polar(angleDeg: number, r: number) {
   const a = ((angleDeg - 90) * Math.PI) / 180;
   return {
-    x: Math.round((CENTER.x + Math.cos(a) * r * RADIUS_SCALE) * 100) / 100,
-    y: Math.round((CENTER.y + Math.sin(a) * r * RADIUS_SCALE) * 100) / 100,
+    x: svgNum(CENTER.x + Math.cos(a) * r * RADIUS_SCALE),
+    y: svgNum(CENTER.y + Math.sin(a) * r * RADIUS_SCALE),
   };
 }
 function polarAbs(angleDeg: number, rPx: number) {
   const a = ((angleDeg - 90) * Math.PI) / 180;
   return {
-    x: Math.round((CENTER.x + Math.cos(a) * rPx) * 100) / 100,
-    y: Math.round((CENTER.y + Math.sin(a) * rPx) * 100) / 100,
+    x: svgNum(CENTER.x + Math.cos(a) * rPx),
+    y: svgNum(CENTER.y + Math.sin(a) * rPx),
   };
 }
 function sectorPath(startDeg: number, endDeg: number, rInner: number, rOuter: number) {
@@ -57,7 +72,9 @@ function sectorPath(startDeg: number, endDeg: number, rInner: number, rOuter: nu
   const b1 = polarAbs(endDeg,   rInner);
   const b2 = polarAbs(startDeg, rInner);
   const large = Math.abs(endDeg - startDeg) > 180 ? 1 : 0;
-  return `M ${a1.x} ${a1.y} A ${rOuter} ${rOuter} 0 ${large} 1 ${a2.x} ${a2.y} L ${b1.x} ${b1.y} A ${rInner} ${rInner} 0 ${large} 0 ${b2.x} ${b2.y} Z`;
+  const outer = svgPathNum(rOuter);
+  const inner = svgPathNum(rInner);
+  return `M ${svgPathNum(a1.x)} ${svgPathNum(a1.y)} A ${outer} ${outer} 0 ${large} 1 ${svgPathNum(a2.x)} ${svgPathNum(a2.y)} L ${svgPathNum(b1.x)} ${svgPathNum(b1.y)} A ${inner} ${inner} 0 ${large} 0 ${svgPathNum(b2.x)} ${svgPathNum(b2.y)} Z`;
 }
 
 function linkKey(s: string, t: string) {
@@ -152,18 +169,22 @@ export function EcosystemGraph({
             </feMerge>
           </filter>
           {SECTORS.map((s) => {
-            const mid = (s.startAngle + s.endAngle) / 2;
             const id = `sectorArc-${s.id}`;
             const r = RADIUS_SCALE * 0.66;
             const a = polarAbs(s.startAngle + 4, r);
             const b = polarAbs(s.endAngle - 4, r);
             return (
-              <path key={id} id={id} d={`M ${a.x} ${a.y} A ${r} ${r} 0 0 1 ${b.x} ${b.y}`} fill="none" />
+              <path
+                key={id}
+                id={id}
+                d={`M ${svgPathNum(a.x)} ${svgPathNum(a.y)} A ${svgPathNum(r)} ${svgPathNum(r)} 0 0 1 ${svgPathNum(b.x)} ${svgPathNum(b.y)}`}
+                fill="none"
+              />
             );
           })}
         </defs>
 
-        <g transform={`translate(${view.x} ${view.y}) scale(${view.k})`}>
+        <g transform={`translate(${svgPathNum(view.x)} ${svgPathNum(view.y)}) scale(${svgPathNum(view.k)})`}>
           {/* Quantum-Secure outer shell band */}
           <circle cx={CENTER.x} cy={CENTER.y} r={QUANTUM_R + 18} fill="url(#quantumShell)" />
           <circle
@@ -230,7 +251,7 @@ export function EcosystemGraph({
               key={r}
               cx={CENTER.x}
               cy={CENTER.y}
-              r={r * RADIUS_SCALE}
+              r={svgNum(r * RADIUS_SCALE)}
               fill="none"
               stroke="var(--grid-line)"
               strokeDasharray="2 10"
@@ -289,7 +310,7 @@ export function EcosystemGraph({
             return (
               <g
                 key={n.id}
-                transform={`translate(${p.x} ${p.y})`}
+                transform={`translate(${svgPathNum(p.x)} ${svgPathNum(p.y)})`}
                 style={{ cursor: "pointer", opacity: dim ? 0.22 : 1, transition: "opacity 250ms" }}
                 onMouseEnter={() => setHovered(n.id)}
                 onMouseLeave={() => setHovered(null)}
@@ -458,24 +479,25 @@ function NodeShape({
   className?: string;
 }) {
   const common = { fill, stroke, strokeWidth, strokeOpacity, opacity, filter, className } as const;
-  if (shape === "circle") return <circle r={r} {...common} />;
+  const roundedR = svgNum(r);
+  if (shape === "circle") return <circle r={roundedR} {...common} />;
   if (shape === "square") {
-    const s = r * 1.7;
-    return <rect x={-s / 2} y={-s / 2} width={s} height={s} rx={r * 0.25} {...common} />;
+    const s = svgNum(r * 1.7);
+    return <rect x={svgNum(-s / 2)} y={svgNum(-s / 2)} width={s} height={s} rx={svgNum(r * 0.25)} {...common} />;
   }
   if (shape === "diamond") {
-    const s = r * 1.15;
-    return <polygon points={`0,${-s} ${s},0 0,${s} ${-s},0`} {...common} />;
+    const s = svgNum(r * 1.15);
+    return <polygon points={`${svgPair(0, -s)} ${svgPair(s, 0)} ${svgPair(0, s)} ${svgPair(-s, 0)}`} {...common} />;
   }
   if (shape === "hex") {
     const pts = Array.from({ length: 6 }, (_, i) => {
       const a = (Math.PI / 3) * i - Math.PI / 2;
-      return `${Math.cos(a) * r},${Math.sin(a) * r}`;
+      return svgPair(Math.cos(a) * r, Math.sin(a) * r);
     }).join(" ");
     return <polygon points={pts} {...common} />;
   }
   // shield
-  const w = r * 1.6, h = r * 1.9;
-  const d = `M ${-w / 2} ${-h / 2} L ${w / 2} ${-h / 2} L ${w / 2} ${h / 4} Q ${w / 2} ${h / 2} 0 ${h / 2} Q ${-w / 2} ${h / 2} ${-w / 2} ${h / 4} Z`;
+  const w = svgNum(r * 1.6), h = svgNum(r * 1.9);
+  const d = `M ${svgPathNum(-w / 2)} ${svgPathNum(-h / 2)} L ${svgPathNum(w / 2)} ${svgPathNum(-h / 2)} L ${svgPathNum(w / 2)} ${svgPathNum(h / 4)} Q ${svgPathNum(w / 2)} ${svgPathNum(h / 2)} 0 ${svgPathNum(h / 2)} Q ${svgPathNum(-w / 2)} ${svgPathNum(h / 2)} ${svgPathNum(-w / 2)} ${svgPathNum(h / 4)} Z`;
   return <path d={d} {...common} />;
 }
