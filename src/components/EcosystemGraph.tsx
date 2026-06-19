@@ -480,24 +480,25 @@ function NodeShape({
   className?: string;
 }) {
   const common = { fill, stroke, strokeWidth, strokeOpacity, opacity, filter, className } as const;
-  if (shape === "circle") return <circle r={r} {...common} />;
+  const roundedR = svgNum(r);
+  if (shape === "circle") return <circle r={roundedR} {...common} />;
   if (shape === "square") {
-    const s = r * 1.7;
-    return <rect x={-s / 2} y={-s / 2} width={s} height={s} rx={r * 0.25} {...common} />;
+    const s = svgNum(r * 1.7);
+    return <rect x={svgNum(-s / 2)} y={svgNum(-s / 2)} width={s} height={s} rx={svgNum(r * 0.25)} {...common} />;
   }
   if (shape === "diamond") {
-    const s = r * 1.15;
-    return <polygon points={`0,${-s} ${s},0 0,${s} ${-s},0`} {...common} />;
+    const s = svgNum(r * 1.15);
+    return <polygon points={`${svgPair(0, -s)} ${svgPair(s, 0)} ${svgPair(0, s)} ${svgPair(-s, 0)}`} {...common} />;
   }
   if (shape === "hex") {
     const pts = Array.from({ length: 6 }, (_, i) => {
       const a = (Math.PI / 3) * i - Math.PI / 2;
-      return `${Math.cos(a) * r},${Math.sin(a) * r}`;
+      return svgPair(Math.cos(a) * r, Math.sin(a) * r);
     }).join(" ");
     return <polygon points={pts} {...common} />;
   }
   // shield
-  const w = r * 1.6, h = r * 1.9;
-  const d = `M ${-w / 2} ${-h / 2} L ${w / 2} ${-h / 2} L ${w / 2} ${h / 4} Q ${w / 2} ${h / 2} 0 ${h / 2} Q ${-w / 2} ${h / 2} ${-w / 2} ${h / 4} Z`;
+  const w = svgNum(r * 1.6), h = svgNum(r * 1.9);
+  const d = `M ${svgPathNum(-w / 2)} ${svgPathNum(-h / 2)} L ${svgPathNum(w / 2)} ${svgPathNum(-h / 2)} L ${svgPathNum(w / 2)} ${svgPathNum(h / 4)} Q ${svgPathNum(w / 2)} ${svgPathNum(h / 2)} 0 ${svgPathNum(h / 2)} Q ${svgPathNum(-w / 2)} ${svgPathNum(h / 2)} ${svgPathNum(-w / 2)} ${svgPathNum(h / 4)} Z`;
   return <path d={d} {...common} />;
 }
