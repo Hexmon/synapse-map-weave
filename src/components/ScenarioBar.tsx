@@ -1,14 +1,16 @@
 import { SCENARIOS } from "@/lib/ecosystem-data";
-import { Play, Square, Sparkles } from "lucide-react";
+import { Play, Square, Sparkles, Sun, Moon } from "lucide-react";
 
 interface Props {
   activeScenarioId: string | null;
   stepIndex: number;
   onPlay: (id: string) => void;
   onStop: () => void;
+  theme: "dark" | "light";
+  onToggleTheme: () => void;
 }
 
-export function ScenarioBar({ activeScenarioId, stepIndex, onPlay, onStop }: Props) {
+export function ScenarioBar({ activeScenarioId, stepIndex, onPlay, onStop, theme, onToggleTheme }: Props) {
   const active = SCENARIOS.find((s) => s.id === activeScenarioId) ?? null;
 
   return (
@@ -57,6 +59,14 @@ export function ScenarioBar({ activeScenarioId, stepIndex, onPlay, onStop }: Pro
             );
           })}
         </div>
+        <button
+          onClick={onToggleTheme}
+          aria-label="Toggle theme"
+          className="ml-2 flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card text-foreground transition hover:bg-muted"
+          title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+        >
+          {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+        </button>
       </div>
 
       {active && (

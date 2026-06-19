@@ -32,7 +32,15 @@ function Index() {
     intel: true,
     security: true,
     ops: true,
+    quantum: true,
+    local: true,
   });
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  useEffect(() => {
+    const html = document.documentElement;
+    html.classList.toggle("theme-light", theme === "light");
+    html.classList.toggle("theme-dark", theme === "dark");
+  }, [theme]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [scenarioId, setScenarioId] = useState<string | null>(null);
   const [stepIndex, setStepIndex] = useState(0);
@@ -98,6 +106,8 @@ function Index() {
           setScenarioId(id);
         }}
         onStop={() => setScenarioId(null)}
+        theme={theme}
+        onToggleTheme={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
       />
 
       <LayerPanel
