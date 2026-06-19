@@ -36,19 +36,34 @@ const CENTER = { x: W / 2, y: H / 2 };
 const RADIUS_SCALE = Math.min(W, H) * 0.46;
 const QUANTUM_R = RADIUS_SCALE * 0.7;       // outer secure shell
 const LOCAL_R   = RADIUS_SCALE * 0.22;      // inner local HCI ring
+const SVG_PRECISION = 2;
+
+function svgNum(value: number) {
+  const factor = 10 ** SVG_PRECISION;
+  const rounded = Math.round((value + Number.EPSILON) * factor) / factor;
+  return Object.is(rounded, -0) ? 0 : rounded;
+}
+
+function svgPair(x: number, y: number) {
+  return `${svgNum(x)},${svgNum(y)}`;
+}
+
+function svgPathNum(value: number) {
+  return String(svgNum(value));
+}
 
 function polar(angleDeg: number, r: number) {
   const a = ((angleDeg - 90) * Math.PI) / 180;
   return {
-    x: Math.round((CENTER.x + Math.cos(a) * r * RADIUS_SCALE) * 100) / 100,
-    y: Math.round((CENTER.y + Math.sin(a) * r * RADIUS_SCALE) * 100) / 100,
+    x: svgNum(CENTER.x + Math.cos(a) * r * RADIUS_SCALE),
+    y: svgNum(CENTER.y + Math.sin(a) * r * RADIUS_SCALE),
   };
 }
 function polarAbs(angleDeg: number, rPx: number) {
   const a = ((angleDeg - 90) * Math.PI) / 180;
   return {
-    x: Math.round((CENTER.x + Math.cos(a) * rPx) * 100) / 100,
-    y: Math.round((CENTER.y + Math.sin(a) * rPx) * 100) / 100,
+    x: svgNum(CENTER.x + Math.cos(a) * rPx),
+    y: svgNum(CENTER.y + Math.sin(a) * rPx),
   };
 }
 function sectorPath(startDeg: number, endDeg: number, rInner: number, rOuter: number) {
@@ -57,7 +72,9 @@ function sectorPath(startDeg: number, endDeg: number, rInner: number, rOuter: nu
   const b1 = polarAbs(endDeg,   rInner);
   const b2 = polarAbs(startDeg, rInner);
   const large = Math.abs(endDeg - startDeg) > 180 ? 1 : 0;
-  return `M ${a1.x} ${a1.y} A ${rOuter} ${rOuter} 0 ${large} 1 ${a2.x} ${a2.y} L ${b1.x} ${b1.y} A ${rInner} ${rInner} 0 ${large} 0 ${b2.x} ${b2.y} Z`;
+  const outer = svgPathNum(rOuter);
+  const inner = svgPathNum(rInner);
+  return `M ${svgPathNum(a1.x)} ${svgPathNum(a1.y)} A ${outer} ${outer} 0 ${large} 1 ${svgPathNum(a2.x)} ${svgPathNum(a2.y)} L ${svgPathNum(b1.x)} ${svgPathNum(b1.y)} A ${inner} ${inner} 0 ${large} 0 ${svgPathNum(b2.x)} ${svgPathNum(b2.y)} Z`;
 }
 
 function linkKey(s: string, t: string) {
