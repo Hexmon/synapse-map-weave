@@ -22,8 +22,12 @@ export function LayerPanel({ active, onToggle }: Props) {
               onClick={() => onToggle(id)}
               className="flex w-full items-center gap-3 rounded-lg border border-transparent px-2.5 py-2 text-left transition hover:bg-muted/50"
               style={{
-                borderColor: isOn ? `color-mix(in oklab, ${layer.color} 35%, transparent)` : "transparent",
-                background: isOn ? `color-mix(in oklab, ${layer.color} 8%, transparent)` : undefined,
+                borderColor: isOn
+                  ? `color-mix(in oklab, ${layer.color} 35%, transparent)`
+                  : "transparent",
+                background: isOn
+                  ? `color-mix(in oklab, ${layer.color} 8%, transparent)`
+                  : undefined,
               }}
             >
               <span
@@ -36,7 +40,9 @@ export function LayerPanel({ active, onToggle }: Props) {
               />
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium text-foreground">{layer.label}</div>
-                <div className="truncate text-[11px] text-muted-foreground">{layer.description}</div>
+                <div className="truncate text-[11px] text-muted-foreground">
+                  {layer.description}
+                </div>
               </div>
               {isOn ? (
                 <Eye className="h-3.5 w-3.5 text-muted-foreground" />

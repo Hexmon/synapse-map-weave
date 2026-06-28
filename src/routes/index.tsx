@@ -18,7 +18,8 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Hex Ecosystem — Live System Map" },
       {
         property: "og:description",
-        content: "Explore how cameras, AI, kiosks, LTE and the Smart Brain connect — and simulate live scenarios.",
+        content:
+          "Explore how cameras, AI, kiosks, LTE and the Smart Brain connect — and simulate live scenarios.",
       },
     ],
   }),

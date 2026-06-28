@@ -10,7 +10,14 @@ interface Props {
   onToggleTheme: () => void;
 }
 
-export function ScenarioBar({ activeScenarioId, stepIndex, onPlay, onStop, theme, onToggleTheme }: Props) {
+export function ScenarioBar({
+  activeScenarioId,
+  stepIndex,
+  onPlay,
+  onStop,
+  theme,
+  onToggleTheme,
+}: Props) {
   const active = SCENARIOS.find((s) => s.id === activeScenarioId) ?? null;
 
   return (
@@ -50,7 +57,9 @@ export function ScenarioBar({ activeScenarioId, stepIndex, onPlay, onStop, theme
                     ? "color-mix(in oklab, var(--destructive) 18%, transparent)"
                     : "var(--card)",
                   color: isActive ? "oklch(0.95 0.05 25)" : "var(--foreground)",
-                  boxShadow: isActive ? "0 0 18px color-mix(in oklab, var(--destructive) 50%, transparent)" : "none",
+                  boxShadow: isActive
+                    ? "0 0 18px color-mix(in oklab, var(--destructive) 50%, transparent)"
+                    : "none",
                 }}
               >
                 {isActive ? <Square className="h-3 w-3" /> : <Play className="h-3 w-3" />}
