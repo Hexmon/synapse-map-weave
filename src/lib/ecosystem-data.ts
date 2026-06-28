@@ -209,7 +209,7 @@ export const NODES: EcoNode[] = [
       { label: "Time to detect", value: "< 900 ms" },
     ],
     angle: 350,
-    radius: 0.32,
+    radius: 0.36,
   },
 
   // Infrastructure (outer ring, bottom arc)
@@ -237,8 +237,8 @@ export const NODES: EcoNode[] = [
       { label: "GPU utilisation", value: "65–80%" },
       { label: "Cost / inference", value: "−42% vs cloud" },
     ],
-    angle: 204,
-    radius: 0.32,
+    angle: 210,
+    radius: 0.42,
   },
   {
     id: "cameras",
@@ -265,8 +265,8 @@ export const NODES: EcoNode[] = [
       { label: "Coverage", value: "100% perimeter" },
       { label: "Mean stream uptime", value: "99.95%" },
     ],
-    angle: 10,
-    radius: 0.52,
+    angle: 12,
+    radius: 0.72,
   },
   {
     id: "led",
@@ -294,7 +294,7 @@ export const NODES: EcoNode[] = [
       { label: "Failover", value: "< 1 s" },
     ],
     angle: 78,
-    radius: 0.5,
+    radius: 0.72,
   },
   {
     id: "kiosks",
@@ -320,8 +320,8 @@ export const NODES: EcoNode[] = [
       { label: "Daily interactions", value: "1.2k avg" },
       { label: "Emergency switch-over", value: "< 1 s" },
     ],
-    angle: 100,
-    radius: 0.36,
+    angle: 102,
+    radius: 0.5,
   },
   {
     id: "network-hw",
@@ -347,8 +347,8 @@ export const NODES: EcoNode[] = [
       { label: "Convergence", value: "< 200 ms" },
       { label: "Port availability", value: "99.99%" },
     ],
-    angle: 228,
-    radius: 0.52,
+    angle: 234,
+    radius: 0.74,
   },
 
   // Connectivity
@@ -377,8 +377,8 @@ export const NODES: EcoNode[] = [
       { label: "Avg latency", value: "8 ms" },
       { label: "Packet loss", value: "< 0.1%" },
     ],
-    angle: 276,
-    radius: 0.32,
+    angle: 264,
+    radius: 0.42,
   },
 
   // NEW — LAN (wired synapse)
@@ -412,8 +412,8 @@ export const NODES: EcoNode[] = [
       { label: "Jitter", value: "< 1 ms" },
       { label: "Failover w/ LTE", value: "< 200 ms" },
     ],
-    angle: 300,
-    radius: 0.4,
+    angle: 288,
+    radius: 0.58,
   },
 
   // NEW — Local HCI zone (inner cocoon)
@@ -444,7 +444,7 @@ export const NODES: EcoNode[] = [
       { label: "Offline operation", value: "Full" },
     ],
     angle: 180,
-    radius: 0.14,
+    radius: 0.16,
   },
 
   // Security
@@ -472,8 +472,8 @@ export const NODES: EcoNode[] = [
       { label: "Key rotation", value: "Daily" },
       { label: "PQ readiness", value: "100%" },
     ],
-    angle: 288,
-    radius: 0.62,
+    angle: 330,
+    radius: 0.6,
   },
   {
     id: "tls",
@@ -499,8 +499,8 @@ export const NODES: EcoNode[] = [
       { label: "Handshake p95", value: "12 ms" },
       { label: "Cert incidents", value: "0 / quarter" },
     ],
-    angle: 288,
-    radius: 0.52,
+    angle: 310,
+    radius: 0.72,
   },
   {
     id: "mdm",
@@ -526,8 +526,8 @@ export const NODES: EcoNode[] = [
       { label: "Compliance rate", value: "100%" },
       { label: "MTTR (lost device)", value: "< 5 min" },
     ],
-    angle: 18,
-    radius: 0.62,
+    angle: 32,
+    radius: 0.6,
   },
 
   // Operations
@@ -555,8 +555,8 @@ export const NODES: EcoNode[] = [
       { label: "MTTA", value: "3 min" },
       { label: "Network uptime", value: "99.99%" },
     ],
-    angle: 148,
-    radius: 0.52,
+    angle: 162,
+    radius: 0.72,
   },
   {
     id: "soc",
@@ -582,8 +582,8 @@ export const NODES: EcoNode[] = [
       { label: "MTTD", value: "< 2 min" },
       { label: "Incidents auto-triaged", value: "78%" },
     ],
-    angle: 170,
-    radius: 0.52,
+    angle: 196,
+    radius: 0.72,
   },
   {
     id: "command",
@@ -610,7 +610,7 @@ export const NODES: EcoNode[] = [
       { label: "Scenario coverage", value: "20+ playbooks" },
     ],
     angle: 126,
-    radius: 0.32,
+    radius: 0.4,
   },
   {
     id: "monitor",
@@ -637,7 +637,7 @@ export const NODES: EcoNode[] = [
       { label: "False alarm rate", value: "< 3%" },
     ],
     angle: 144,
-    radius: 0.42,
+    radius: 0.58,
   },
 ];
 
@@ -731,6 +731,51 @@ export const SCENARIOS: Scenario[] = [
       { node: BRAIN_ID, note: "Brain reroutes critical workloads." },
       { node: "gpu", note: "GPU inference rebalanced." },
       { node: "command", note: "Command Center informed, no public impact." },
+    ],
+  },
+  {
+    id: "crowd",
+    name: "Crowd Surge",
+    description: "HexCam detects abnormal crowd density and the brain coordinates flow control.",
+    steps: [
+      { node: "cameras", note: "Cameras stream high-density zone footage." },
+      { node: "hexcam", note: "CrowdNet flags density above safe threshold." },
+      { node: "lan", note: "High-res feed carried over wired LAN backbone." },
+      { node: BRAIN_ID, note: "Brain runs crowd-flow policy, picks diversion." },
+      { node: "darshan", note: "Darshan composes wayfinding overrides." },
+      { node: "kiosks", note: "Kiosks redirect visitors to alternate routes." },
+      { node: "led", note: "LED walls show live heatmap to operators." },
+      { node: "command", note: "Command Center dispatches marshals." },
+    ],
+  },
+  {
+    id: "vip",
+    name: "VIP Arrival",
+    description: "A scheduled VIP arrival triggers a coordinated, secure greet flow.",
+    steps: [
+      { node: "command", note: "Operator arms the VIP playbook." },
+      { node: BRAIN_ID, note: "Brain pre-stages routes, screens and access." },
+      { node: "mdm", note: "MDM pushes temporary device profiles." },
+      { node: "darshan", note: "Darshan schedules welcome content." },
+      { node: "led", note: "LED walls switch to VIP welcome scene." },
+      { node: "kiosks", note: "Kiosks display escort instructions." },
+      { node: "cameras", note: "Cameras lock on motorcade corridor." },
+      { node: "soc", note: "SOC monitors for perimeter anomalies." },
+    ],
+  },
+  {
+    id: "keyrot",
+    name: "PQC Key Rotation",
+    description: "Daily quantum-grade key rotation rolls cleanly through the secure fabric.",
+    steps: [
+      { node: "qrng", note: "QRNG generates fresh quantum entropy." },
+      { node: "tls", note: "TLS fabric issues new short-lived certs." },
+      { node: "local-hci", note: "Local HCI distributes trust to internal DNS." },
+      { node: BRAIN_ID, note: "Brain rotates service identities." },
+      { node: "lan", note: "LAN sessions re-handshake transparently." },
+      { node: "lte", note: "LTE radios refresh SIM-bound keys." },
+      { node: "mdm", note: "MDM rolls device certificates fleet-wide." },
+      { node: "noc", note: "NOC verifies zero handshake errors." },
     ],
   },
 ];
