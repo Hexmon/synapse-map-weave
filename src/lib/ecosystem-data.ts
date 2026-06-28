@@ -209,7 +209,7 @@ export const NODES: EcoNode[] = [
       { label: "Time to detect", value: "< 900 ms" },
     ],
     angle: 350,
-    radius: 0.32,
+    radius: 0.36,
   },
 
   // Infrastructure (outer ring, bottom arc)
@@ -237,8 +237,8 @@ export const NODES: EcoNode[] = [
       { label: "GPU utilisation", value: "65–80%" },
       { label: "Cost / inference", value: "−42% vs cloud" },
     ],
-    angle: 204,
-    radius: 0.32,
+    angle: 210,
+    radius: 0.42,
   },
   {
     id: "cameras",
@@ -265,8 +265,8 @@ export const NODES: EcoNode[] = [
       { label: "Coverage", value: "100% perimeter" },
       { label: "Mean stream uptime", value: "99.95%" },
     ],
-    angle: 10,
-    radius: 0.52,
+    angle: 12,
+    radius: 0.72,
   },
   {
     id: "led",
@@ -294,7 +294,7 @@ export const NODES: EcoNode[] = [
       { label: "Failover", value: "< 1 s" },
     ],
     angle: 78,
-    radius: 0.5,
+    radius: 0.72,
   },
   {
     id: "kiosks",
@@ -320,8 +320,8 @@ export const NODES: EcoNode[] = [
       { label: "Daily interactions", value: "1.2k avg" },
       { label: "Emergency switch-over", value: "< 1 s" },
     ],
-    angle: 100,
-    radius: 0.36,
+    angle: 102,
+    radius: 0.5,
   },
   {
     id: "network-hw",
@@ -347,8 +347,8 @@ export const NODES: EcoNode[] = [
       { label: "Convergence", value: "< 200 ms" },
       { label: "Port availability", value: "99.99%" },
     ],
-    angle: 228,
-    radius: 0.52,
+    angle: 234,
+    radius: 0.74,
   },
 
   // Connectivity
@@ -377,8 +377,8 @@ export const NODES: EcoNode[] = [
       { label: "Avg latency", value: "8 ms" },
       { label: "Packet loss", value: "< 0.1%" },
     ],
-    angle: 276,
-    radius: 0.32,
+    angle: 264,
+    radius: 0.42,
   },
 
   // NEW — LAN (wired synapse)
@@ -412,8 +412,8 @@ export const NODES: EcoNode[] = [
       { label: "Jitter", value: "< 1 ms" },
       { label: "Failover w/ LTE", value: "< 200 ms" },
     ],
-    angle: 300,
-    radius: 0.4,
+    angle: 288,
+    radius: 0.58,
   },
 
   // NEW — Local HCI zone (inner cocoon)
@@ -444,7 +444,7 @@ export const NODES: EcoNode[] = [
       { label: "Offline operation", value: "Full" },
     ],
     angle: 180,
-    radius: 0.14,
+    radius: 0.16,
   },
 
   // Security
@@ -472,8 +472,8 @@ export const NODES: EcoNode[] = [
       { label: "Key rotation", value: "Daily" },
       { label: "PQ readiness", value: "100%" },
     ],
-    angle: 288,
-    radius: 0.62,
+    angle: 330,
+    radius: 0.6,
   },
   {
     id: "tls",
@@ -499,8 +499,8 @@ export const NODES: EcoNode[] = [
       { label: "Handshake p95", value: "12 ms" },
       { label: "Cert incidents", value: "0 / quarter" },
     ],
-    angle: 288,
-    radius: 0.52,
+    angle: 310,
+    radius: 0.72,
   },
   {
     id: "mdm",
@@ -526,8 +526,8 @@ export const NODES: EcoNode[] = [
       { label: "Compliance rate", value: "100%" },
       { label: "MTTR (lost device)", value: "< 5 min" },
     ],
-    angle: 18,
-    radius: 0.62,
+    angle: 32,
+    radius: 0.6,
   },
 
   // Operations
@@ -555,8 +555,8 @@ export const NODES: EcoNode[] = [
       { label: "MTTA", value: "3 min" },
       { label: "Network uptime", value: "99.99%" },
     ],
-    angle: 148,
-    radius: 0.52,
+    angle: 162,
+    radius: 0.72,
   },
   {
     id: "soc",
@@ -582,8 +582,8 @@ export const NODES: EcoNode[] = [
       { label: "MTTD", value: "< 2 min" },
       { label: "Incidents auto-triaged", value: "78%" },
     ],
-    angle: 170,
-    radius: 0.52,
+    angle: 196,
+    radius: 0.72,
   },
   {
     id: "command",
@@ -610,7 +610,7 @@ export const NODES: EcoNode[] = [
       { label: "Scenario coverage", value: "20+ playbooks" },
     ],
     angle: 126,
-    radius: 0.32,
+    radius: 0.4,
   },
   {
     id: "monitor",
@@ -637,7 +637,7 @@ export const NODES: EcoNode[] = [
       { label: "False alarm rate", value: "< 3%" },
     ],
     angle: 144,
-    radius: 0.42,
+    radius: 0.58,
   },
 ];
 
