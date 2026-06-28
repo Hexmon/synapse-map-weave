@@ -1,24 +1,47 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  BrainCircuit, MonitorPlay, Eye, Server, Camera, Tv2, Smartphone, Network,
-  Radio, Atom, Lock, ShieldCheck, Activity, ShieldAlert, LayoutDashboard, LineChart,
-  Cable, ServerCog,
+  BrainCircuit,
+  MonitorPlay,
+  Eye,
+  Server,
+  Camera,
+  Tv2,
+  Smartphone,
+  Network,
+  Radio,
+  Atom,
+  Lock,
+  ShieldCheck,
+  Activity,
+  ShieldAlert,
+  LayoutDashboard,
+  LineChart,
+  Cable,
+  ServerCog,
   type LucideIcon,
 } from "lucide-react";
-import {
-  NODES,
-  LINKS,
-  LAYERS,
-  SECTORS,
-  type EcoNode,
-  type LayerId,
-} from "@/lib/ecosystem-data";
+import { NODES, LINKS, LAYERS, SECTORS, type EcoNode, type LayerId } from "@/lib/ecosystem-data";
 
 const ICONS: Record<string, LucideIcon> = {
-  BrainCircuit, MonitorPlay, Eye, Server, Camera, Tv2, Smartphone, Network,
-  Radio, Atom, Lock, ShieldCheck, Activity, ShieldAlert, LayoutDashboard, LineChart,
-  Cable, ServerCog,
+  BrainCircuit,
+  MonitorPlay,
+  Eye,
+  Server,
+  Camera,
+  Tv2,
+  Smartphone,
+  Network,
+  Radio,
+  Atom,
+  Lock,
+  ShieldCheck,
+  Activity,
+  ShieldAlert,
+  LayoutDashboard,
+  LineChart,
+  Cable,
+  ServerCog,
 };
 
 interface Props {
@@ -34,8 +57,8 @@ const W = 1400;
 const H = 900;
 const CENTER = { x: W / 2, y: H / 2 };
 const RADIUS_SCALE = Math.min(W, H) * 0.46;
-const QUANTUM_R = RADIUS_SCALE * 0.7;       // outer secure shell
-const LOCAL_R   = RADIUS_SCALE * 0.22;      // inner local HCI ring
+const QUANTUM_R = RADIUS_SCALE * 0.7; // outer secure shell
+const LOCAL_R = RADIUS_SCALE * 0.22; // inner local HCI ring
 const SVG_PRECISION = 2;
 
 function svgNum(value: number) {
@@ -68,8 +91,8 @@ function polarAbs(angleDeg: number, rPx: number) {
 }
 function sectorPath(startDeg: number, endDeg: number, rInner: number, rOuter: number) {
   const a1 = polarAbs(startDeg, rOuter);
-  const a2 = polarAbs(endDeg,   rOuter);
-  const b1 = polarAbs(endDeg,   rInner);
+  const a2 = polarAbs(endDeg, rOuter);
+  const b1 = polarAbs(endDeg, rInner);
   const b2 = polarAbs(startDeg, rInner);
   const large = Math.abs(endDeg - startDeg) > 180 ? 1 : 0;
   const outer = svgPathNum(rOuter);
@@ -128,7 +151,11 @@ export function EcosystemGraph({
       }}
       onMouseMove={(e) => {
         if (dragging.current) {
-          setView((v) => ({ ...v, x: e.clientX - dragging.current!.x, y: e.clientY - dragging.current!.y }));
+          setView((v) => ({
+            ...v,
+            x: e.clientX - dragging.current!.x,
+            y: e.clientY - dragging.current!.y,
+          }));
         }
       }}
       onMouseUp={() => (dragging.current = null)}
@@ -152,13 +179,13 @@ export function EcosystemGraph({
       >
         <defs>
           <radialGradient id="brainGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%"   stopColor="var(--brain)"        stopOpacity="0.85" />
-            <stop offset="60%"  stopColor="var(--brain)"        stopOpacity="0.25" />
-            <stop offset="100%" stopColor="var(--brain)"        stopOpacity="0" />
+            <stop offset="0%" stopColor="var(--brain)" stopOpacity="0.85" />
+            <stop offset="60%" stopColor="var(--brain)" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="var(--brain)" stopOpacity="0" />
           </radialGradient>
           <radialGradient id="quantumShell" cx="50%" cy="50%" r="50%">
-            <stop offset="0%"   stopColor="var(--layer-quantum)" stopOpacity="0" />
-            <stop offset="92%"  stopColor="var(--layer-quantum)" stopOpacity="0.05" />
+            <stop offset="0%" stopColor="var(--layer-quantum)" stopOpacity="0" />
+            <stop offset="92%" stopColor="var(--layer-quantum)" stopOpacity="0.05" />
             <stop offset="100%" stopColor="var(--layer-quantum)" stopOpacity="0.35" />
           </radialGradient>
           <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
@@ -184,11 +211,15 @@ export function EcosystemGraph({
           })}
         </defs>
 
-        <g transform={`translate(${svgPathNum(view.x)} ${svgPathNum(view.y)}) scale(${svgPathNum(view.k)})`}>
+        <g
+          transform={`translate(${svgPathNum(view.x)} ${svgPathNum(view.y)}) scale(${svgPathNum(view.k)})`}
+        >
           {/* Quantum-Secure outer shell band */}
           <circle cx={CENTER.x} cy={CENTER.y} r={QUANTUM_R + 18} fill="url(#quantumShell)" />
           <circle
-            cx={CENTER.x} cy={CENTER.y} r={QUANTUM_R}
+            cx={CENTER.x}
+            cy={CENTER.y}
+            r={QUANTUM_R}
             fill="none"
             stroke="var(--layer-quantum)"
             strokeOpacity={0.55}
@@ -232,12 +263,16 @@ export function EcosystemGraph({
 
           {/* Local HCI inner secure ring */}
           <circle
-            cx={CENTER.x} cy={CENTER.y} r={LOCAL_R}
+            cx={CENTER.x}
+            cy={CENTER.y}
+            r={LOCAL_R}
             fill="var(--layer-local)"
             opacity={0.05}
           />
           <circle
-            cx={CENTER.x} cy={CENTER.y} r={LOCAL_R}
+            cx={CENTER.x}
+            cy={CENTER.y}
+            r={LOCAL_R}
             fill="none"
             stroke="var(--layer-local)"
             strokeOpacity={0.55}
@@ -272,9 +307,7 @@ export function EcosystemGraph({
             const key = linkKey(l.source, l.target);
             const isHL = highlightedLinks.has(key);
             const isFlow = flowingLinks.has(key);
-            const color = isHL
-              ? "oklch(0.9 0.2 25)"
-              : `var(--layer-${tNode.layer})`;
+            const color = isHL ? "oklch(0.9 0.2 25)" : `var(--layer-${tNode.layer})`;
             return (
               <g key={key}>
                 <line
@@ -287,9 +320,7 @@ export function EcosystemGraph({
                   strokeWidth={isHL ? 2.4 : 1.2}
                   filter={isHL ? "url(#glow)" : undefined}
                 />
-                {isFlow && (
-                  <FlowingPulse a={a} b={b} color={color} />
-                )}
+                {isFlow && <FlowingPulse a={a} b={b} color={color} />}
               </g>
             );
           })}
@@ -320,10 +351,23 @@ export function EcosystemGraph({
                 }}
               >
                 {(isHL || isSelected || n.isBrain) && (
-                  <NodeShape shape={shape} r={r + 14} fill={color} opacity={0.18} className="animate-pulse-ring" />
+                  <NodeShape
+                    shape={shape}
+                    r={r + 14}
+                    fill={color}
+                    opacity={0.18}
+                    className="animate-pulse-ring"
+                  />
                 )}
                 {(isHL || isSelected || n.isBrain) && (
-                  <NodeShape shape={shape} r={r + 7} fill="none" stroke={color} strokeOpacity={0.5} strokeWidth={1} />
+                  <NodeShape
+                    shape={shape}
+                    r={r + 7}
+                    fill="none"
+                    stroke={color}
+                    strokeOpacity={0.5}
+                    strokeWidth={1}
+                  />
                 )}
                 <NodeShape
                   shape={shape}
@@ -455,18 +499,33 @@ function truncate(s: string, n: number) {
 
 function layerShape(layer: LayerId): "circle" | "square" | "diamond" | "hex" | "shield" {
   switch (layer) {
-    case "infra": return "square";
-    case "connect": return "diamond";
-    case "intel": return "hex";
-    case "security": return "shield";
-    case "ops": return "circle";
-    case "quantum": return "shield";
-    case "local": return "hex";
+    case "infra":
+      return "square";
+    case "connect":
+      return "diamond";
+    case "intel":
+      return "hex";
+    case "security":
+      return "shield";
+    case "ops":
+      return "circle";
+    case "quantum":
+      return "shield";
+    case "local":
+      return "hex";
   }
 }
 
 function NodeShape({
-  shape, r, fill, stroke, strokeWidth, strokeOpacity, opacity, filter, className,
+  shape,
+  r,
+  fill,
+  stroke,
+  strokeWidth,
+  strokeOpacity,
+  opacity,
+  filter,
+  className,
 }: {
   shape: "circle" | "square" | "diamond" | "hex" | "shield";
   r: number;
@@ -483,11 +542,25 @@ function NodeShape({
   if (shape === "circle") return <circle r={roundedR} {...common} />;
   if (shape === "square") {
     const s = svgNum(r * 1.7);
-    return <rect x={svgNum(-s / 2)} y={svgNum(-s / 2)} width={s} height={s} rx={svgNum(r * 0.25)} {...common} />;
+    return (
+      <rect
+        x={svgNum(-s / 2)}
+        y={svgNum(-s / 2)}
+        width={s}
+        height={s}
+        rx={svgNum(r * 0.25)}
+        {...common}
+      />
+    );
   }
   if (shape === "diamond") {
     const s = svgNum(r * 1.15);
-    return <polygon points={`${svgPair(0, -s)} ${svgPair(s, 0)} ${svgPair(0, s)} ${svgPair(-s, 0)}`} {...common} />;
+    return (
+      <polygon
+        points={`${svgPair(0, -s)} ${svgPair(s, 0)} ${svgPair(0, s)} ${svgPair(-s, 0)}`}
+        {...common}
+      />
+    );
   }
   if (shape === "hex") {
     const pts = Array.from({ length: 6 }, (_, i) => {
@@ -497,7 +570,8 @@ function NodeShape({
     return <polygon points={pts} {...common} />;
   }
   // shield
-  const w = svgNum(r * 1.6), h = svgNum(r * 1.9);
+  const w = svgNum(r * 1.6),
+    h = svgNum(r * 1.9);
   const d = `M ${svgPathNum(-w / 2)} ${svgPathNum(-h / 2)} L ${svgPathNum(w / 2)} ${svgPathNum(-h / 2)} L ${svgPathNum(w / 2)} ${svgPathNum(h / 4)} Q ${svgPathNum(w / 2)} ${svgPathNum(h / 2)} 0 ${svgPathNum(h / 2)} Q ${svgPathNum(-w / 2)} ${svgPathNum(h / 2)} ${svgPathNum(-w / 2)} ${svgPathNum(h / 4)} Z`;
   return <path d={d} {...common} />;
 }
