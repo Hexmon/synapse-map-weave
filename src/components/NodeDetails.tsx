@@ -1,15 +1,51 @@
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  X, BrainCircuit, MonitorPlay, Eye, Server, Camera, Tv2, Smartphone, Network,
-  Radio, Atom, Lock, ShieldCheck, Activity, ShieldAlert, LayoutDashboard, LineChart,
-  Wrench, Gauge, Cpu, Link2, Cable, ServerCog, type LucideIcon,
+  X,
+  BrainCircuit,
+  MonitorPlay,
+  Eye,
+  Server,
+  Camera,
+  Tv2,
+  Smartphone,
+  Network,
+  Radio,
+  Atom,
+  Lock,
+  ShieldCheck,
+  Activity,
+  ShieldAlert,
+  LayoutDashboard,
+  LineChart,
+  Wrench,
+  Gauge,
+  Cpu,
+  Link2,
+  Cable,
+  ServerCog,
+  type LucideIcon,
 } from "lucide-react";
 import { NODES, LINKS, LAYERS, type EcoNode } from "@/lib/ecosystem-data";
 
 const ICONS: Record<string, LucideIcon> = {
-  BrainCircuit, MonitorPlay, Eye, Server, Camera, Tv2, Smartphone, Network,
-  Radio, Atom, Lock, ShieldCheck, Activity, ShieldAlert, LayoutDashboard, LineChart,
-  Cable, ServerCog,
+  BrainCircuit,
+  MonitorPlay,
+  Eye,
+  Server,
+  Camera,
+  Tv2,
+  Smartphone,
+  Network,
+  Radio,
+  Atom,
+  Lock,
+  ShieldCheck,
+  Activity,
+  ShieldAlert,
+  LayoutDashboard,
+  LineChart,
+  Cable,
+  ServerCog,
 };
 
 interface Props {
@@ -121,8 +157,12 @@ export function NodeDetails({ nodeId, onClose, onSelect }: Props) {
                       background: `color-mix(in oklab, ${layerColor} 8%, transparent)`,
                     }}
                   >
-                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground">{k.label}</div>
-                    <div className="text-sm font-bold" style={{ color: layerColor }}>{k.value}</div>
+                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
+                      {k.label}
+                    </div>
+                    <div className="text-sm font-bold" style={{ color: layerColor }}>
+                      {k.value}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -157,7 +197,15 @@ export function NodeDetails({ nodeId, onClose, onSelect }: Props) {
   );
 }
 
-function Section({ title, children, icon: Icon }: { title: string; children: React.ReactNode; icon?: LucideIcon }) {
+function Section({
+  title,
+  children,
+  icon: Icon,
+}: {
+  title: string;
+  children: React.ReactNode;
+  icon?: LucideIcon;
+}) {
   return (
     <div className="mb-4">
       <h3 className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
@@ -186,7 +234,9 @@ function ConnectedNodes({ node, onSelect }: { node: EcoNode; onSelect: (id: stri
             key={c.id}
             onClick={() => onSelect(c.id)}
             className="rounded-md border border-border/60 bg-background/40 px-2 py-1 text-[11px] text-foreground/80 transition hover:border-primary hover:text-foreground"
-            style={{ borderColor: `color-mix(in oklab, ${LAYERS[c.layer].color} 35%, transparent)` }}
+            style={{
+              borderColor: `color-mix(in oklab, ${LAYERS[c.layer].color} 35%, transparent)`,
+            }}
           >
             {c.label}
           </button>
