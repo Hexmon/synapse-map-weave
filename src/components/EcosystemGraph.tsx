@@ -53,12 +53,12 @@ interface Props {
   flowingLinks: Set<string>;
 }
 
-const W = 1400;
-const H = 900;
+const W = 1800;
+const H = 1100;
 const CENTER = { x: W / 2, y: H / 2 };
-const RADIUS_SCALE = Math.min(W, H) * 0.46;
-const QUANTUM_R = RADIUS_SCALE * 0.7; // outer secure shell
-const LOCAL_R = RADIUS_SCALE * 0.22; // inner local HCI ring
+const RADIUS_SCALE = Math.min(W, H) * 0.48;
+const QUANTUM_R = RADIUS_SCALE * 0.92; // outer secure shell
+const LOCAL_R = RADIUS_SCALE * 0.2; // inner local HCI ring
 const SVG_PRECISION = 2;
 
 function svgNum(value: number) {
@@ -183,6 +183,11 @@ export function EcosystemGraph({
             <stop offset="60%" stopColor="var(--brain)" stopOpacity="0.25" />
             <stop offset="100%" stopColor="var(--brain)" stopOpacity="0" />
           </radialGradient>
+          <radialGradient id="radarSweep" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="var(--signal)" stopOpacity="0.55" />
+            <stop offset="55%" stopColor="var(--signal)" stopOpacity="0.18" />
+            <stop offset="100%" stopColor="var(--signal)" stopOpacity="0" />
+          </radialGradient>
           <radialGradient id="quantumShell" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="var(--layer-quantum)" stopOpacity="0" />
             <stop offset="92%" stopColor="var(--layer-quantum)" stopOpacity="0.05" />
@@ -197,7 +202,7 @@ export function EcosystemGraph({
           </filter>
           {SECTORS.map((s) => {
             const id = `sectorArc-${s.id}`;
-            const r = RADIUS_SCALE * 0.66;
+            const r = RADIUS_SCALE * 0.86;
             const a = polarAbs(s.startAngle + 4, r);
             const b = polarAbs(s.endAngle - 4, r);
             return (
@@ -214,6 +219,26 @@ export function EcosystemGraph({
         <g
           transform={`translate(${svgPathNum(view.x)} ${svgPathNum(view.y)}) scale(${svgPathNum(view.k)})`}
         >
+          {/* Radar concentric pulse rings — continuously expanding from the brain */}
+          {[0, 1, 2].map((i) => (
+            <motion.circle
+              key={`radar-pulse-${i}`}
+              cx={CENTER.x}
+              cy={CENTER.y}
+              fill="none"
+              stroke="var(--signal)"
+              strokeWidth={1.2}
+              initial={{ r: LOCAL_R, opacity: 0.55 }}
+              animate={{ r: QUANTUM_R, opacity: 0 }}
+              transition={{
+                duration: 5,
+                repeat: Infinity,
+                ease: "easeOut",
+                delay: i * 1.66,
+              }}
+            />
+          ))}
+
           {/* Quantum-Secure outer shell band */}
           <circle cx={CENTER.x} cy={CENTER.y} r={QUANTUM_R + 18} fill="url(#quantumShell)" />
           <circle
@@ -238,22 +263,35 @@ export function EcosystemGraph({
             </textPath>
           </text>
 
+          {/* Radar sweep — rotating wedge of light scanning the field */}
+          <motion.g
+            style={{ transformOrigin: `${CENTER.x}px ${CENTER.y}px` }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+          >
+            <path
+              d={`M ${CENTER.x} ${CENTER.y} L ${CENTER.x + QUANTUM_R} ${CENTER.y} A ${svgPathNum(QUANTUM_R)} ${svgPathNum(QUANTUM_R)} 0 0 0 ${svgPathNum(CENTER.x + Math.cos((-55 * Math.PI) / 180) * QUANTUM_R)} ${svgPathNum(CENTER.y + Math.sin((-55 * Math.PI) / 180) * QUANTUM_R)} Z`}
+              fill="url(#radarSweep)"
+              opacity={0.85}
+            />
+          </motion.g>
+
           {/* Sector wedges */}
           {SECTORS.map((s) => (
             <g key={s.id} pointerEvents="none">
               <path
                 d={sectorPath(s.startAngle, s.endAngle, LOCAL_R + 18, QUANTUM_R - 6)}
                 fill={s.color}
-                opacity={0.04}
+                opacity={0.035}
               />
               <path
                 d={sectorPath(s.startAngle, s.endAngle, LOCAL_R + 18, QUANTUM_R - 6)}
                 fill="none"
                 stroke={s.color}
-                strokeOpacity={0.18}
+                strokeOpacity={0.22}
                 strokeWidth={1}
               />
-              <text fontSize="11" letterSpacing="0.25em" fill={s.color} opacity={0.95}>
+              <text fontSize="13" letterSpacing="0.3em" fill={s.color} opacity={0.95}>
                 <textPath href={`#sectorArc-${s.id}`} startOffset="50%" textAnchor="middle">
                   {s.label.toUpperCase()} · {s.sublabel}
                 </textPath>
@@ -281,7 +319,7 @@ export function EcosystemGraph({
           />
 
           {/* Subtle concentric guides */}
-          {[0.32, 0.52].map((r) => (
+          {[0.35, 0.55, 0.75].map((r) => (
             <circle
               key={r}
               cx={CENTER.x}
@@ -294,7 +332,7 @@ export function EcosystemGraph({
           ))}
 
           {/* Brain glow */}
-          <circle cx={CENTER.x} cy={CENTER.y} r={140} fill="url(#brainGlow)" />
+          <circle cx={CENTER.x} cy={CENTER.y} r={180} fill="url(#brainGlow)" />
 
           {/* Links */}
           {LINKS.map((l) => {
@@ -333,9 +371,9 @@ export function EcosystemGraph({
             const isHL = highlightedNodes.has(n.id);
             const dim = (highlightedNodes.size > 0 || selectedId) && !isHL && !isSelected;
             const color = n.isBrain ? "var(--brain)" : `var(--layer-${n.layer})`;
-            const r = n.isBrain ? 46 : isSelected || isHover ? 26 : 22;
+            const r = n.isBrain ? 52 : isSelected || isHover ? 24 : 20;
             const Icon = ICONS[n.icon] ?? Server;
-            const iconSize = n.isBrain ? 36 : 22;
+            const iconSize = n.isBrain ? 40 : 20;
             // Distinct shape per layer for instant visual recognition
             const shape = n.isBrain ? "hex" : layerShape(n.layer);
             return (
